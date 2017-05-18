@@ -1,0 +1,29 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2008
+
+Project("{D3725FF3-BB9B-92C0-811B-AEE5DF315BD4}") = "MultiplayerNodeJsClient", "Assembly-CSharp.csproj", "{EBF8DB1B-6F7B-55B7-5186-1FAEE3A689EA}"
+EndProject
+Project("{D3725FF3-BB9B-92C0-811B-AEE5DF315BD4}") = "MultiplayerNodeJsClient", "Assembly-CSharp-Editor.csproj", "{E2B81498-5F3D-75DD-062A-FB9790A0A2C8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EBF8DB1B-6F7B-55B7-5186-1FAEE3A689EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBF8DB1B-6F7B-55B7-5186-1FAEE3A689EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBF8DB1B-6F7B-55B7-5186-1FAEE3A689EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBF8DB1B-6F7B-55B7-5186-1FAEE3A689EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2B81498-5F3D-75DD-062A-FB9790A0A2C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2B81498-5F3D-75DD-062A-FB9790A0A2C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2B81498-5F3D-75DD-062A-FB9790A0A2C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2B81498-5F3D-75DD-062A-FB9790A0A2C8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+	EndGlobalSection
+EndGlobal
