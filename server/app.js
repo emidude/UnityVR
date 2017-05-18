@@ -26,8 +26,8 @@ io.on("connection", function(socket)
 
 	socket.on("register", function(client)
 	{
-		console.log("register " + client.userid)
-		clients.push(client.userid);
+		console.log("register " + client.userId)
+		clients.push(client.userId);
 
 		if(clients.length == 2)
 		{
