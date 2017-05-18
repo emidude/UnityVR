@@ -24,10 +24,10 @@ io.on("connection", function(socket)
 
 	var currentUser;
 
-	socket.on("register", function(userid)
+	socket.on("register", function(client)
 	{
-		console.log("register " + userid)
-		clients.push(userid);
+		console.log("register " + client.userid)
+		clients.push(client.userid);
 
 		if(clients.length == 2)
 		{
