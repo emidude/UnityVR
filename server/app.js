@@ -24,22 +24,15 @@ io.on("connection", function(socket)
 
 	var currentUser;
 
-	socket.on("USER_CONNECT", function() 
+	socket.on("register", function(userid)
 	{
-		console.log("user connected");
+		console.log("register " + userid)
+		clients.push(userid);
 
-		for(var i = 0; i < clients.length; i++)
+		if(clients.length == 2)
 		{
-			socket.emit("USER_CONNECTED", {name: clients[i].name, position: clients[i].position});
-			console.log("User name " + clients[i].name + " is connected");
+			socket.emit("playVideo");
 		}
-	});
-
-	socket.on("beep", function()
-	{
-		console.log("received beep");
-
-		socket.emit("boop");
 	});
 });
 
