@@ -46,14 +46,13 @@ public class Client : MonoBehaviour {
 
 		connectButton.onClick.AddListener(OnConnectButtonClicked);
 
-		Debug.LogFormat("Trying to connect to {0}:{1}", ip, port);
-
 		PlayLoopVideo();
 	}
 
 	private void OnConnectButtonClicked ()
 	{
 		client.Connect(ipInput.text, port);
+		Debug.LogFormat("Trying to connect to {0}:{1}", ip, port);
 	}
 
 	private void PlayLoopVideo ()
