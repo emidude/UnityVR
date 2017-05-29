@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System;
 using UnityEngine.Video;
+using UnityEngine.UI;
 
 public class Client : MonoBehaviour {
 
@@ -14,13 +15,27 @@ public class Client : MonoBehaviour {
 	private int port;
 
 	[SerializeField]
+	private VideoClip loopVideo;
+
+	[SerializeField]
+	private VideoClip experienceVideo;
+
+	[SerializeField]
 	private VideoPlayer videoPlayer;
+
+	[SerializeField]
+	private Canvas UI;
+
+	[SerializeField]
+	private InputField ipInput;
+
+	[SerializeField]
+	private Button connectButton;
 
 	private NetworkClient client;
 
 	private void Awake()
 	{
-
 		client = new NetworkClient();
 
 		client.RegisterHandler(MsgType.Connect, OnConnected);
@@ -29,19 +44,54 @@ public class Client : MonoBehaviour {
 		client.RegisterHandler(CustomMsgType.ReadyToPlay, OnReadyToPlay);
 		client.RegisterHandler(CustomMsgType.RestartClient, OnRestartClient);
 
-		client.Connect(ip, port);
+		connectButton.onClick.AddListener(OnConnectButtonClicked);
+
 		Debug.LogFormat("Trying to connect to {0}:{1}", ip, port);
-	
+
+		PlayLoopVideo();
+	}
+
+	private void OnConnectButtonClicked ()
+	{
+		client.Connect(ipInput.text, port);
+	}
+
+	private void PlayLoopVideo ()
+	{
+		videoPlayer.clip = loopVideo;
+		videoPlayer.isLooping = true;
+		videoPlayer.Play();
+	}
+
+	private void PlayExperienceVideo ()
+	{
+		videoPlayer.clip = experienceVideo;
+		videoPlayer.isLooping = false;
+		videoPlayer.Play();
+
+		StartCoroutine(ChangeToLoopWhenFinished());
+	}
+
+	private IEnumerator ChangeToLoopWhenFinished ()
+	{
+		while(videoPlayer.isPlaying)
+		{
+			yield return new WaitForEndOfFrame();
+		}
+
+		PlayLoopVideo();
 	}
 
 	private void OnConnected (NetworkMessage netMsg)
 	{
+		UI.gameObject.SetActive(false);
 		Debug.Log(string.Format("Client has connected to server with connection id: {0}", netMsg.conn.connectionId));
 		NetworkServer.SetClientReady(netMsg.conn);
 	}
 
 	private void OnDisconnected (NetworkMessage netMsg)
 	{
+		UI.gameObject.SetActive(true);
 		Debug.Log("Client disconnected!");
 	}
 
@@ -52,6 +102,7 @@ public class Client : MonoBehaviour {
 
 	private void OnServerDisonnect (NetworkMessage netMsg)
 	{
+		UI.gameObject.SetActive(true);
 		Debug.Log("disconnect!");
 
 	}
@@ -61,7 +112,7 @@ public class Client : MonoBehaviour {
 		ReadyToPlayVideoMessage message = netMsg.reader.ReadMessage<ReadyToPlayVideoMessage>();
 		Debug.Log("on ready to play" + message);
 
-		videoPlayer.Play();
+		PlayExperienceVideo();
 	}
 
 	private void OnRestartClient (NetworkMessage netMsg)
