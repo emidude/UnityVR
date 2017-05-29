@@ -5,11 +5,9 @@ using UnityEngine.Networking;
 using System;
 using UnityEngine.Video;
 using UnityEngine.UI;
+using UnityEngine.VR;
 
 public class Client : MonoBehaviour {
-
-	[SerializeField]
-	private string ip;
 
 	[SerializeField]
 	private int port;
@@ -34,8 +32,12 @@ public class Client : MonoBehaviour {
 
 	private NetworkClient client;
 
+	private string ip;
+
 	private void Awake()
 	{
+		VRSettings.enabled = false;
+
 		client = new NetworkClient();
 
 		client.RegisterHandler(MsgType.Connect, OnConnected);
@@ -51,7 +53,8 @@ public class Client : MonoBehaviour {
 
 	private void OnConnectButtonClicked ()
 	{
-		client.Connect(ipInput.text, port);
+		ip = ipInput.text;
+		client.Connect(ip, port);
 		Debug.LogFormat("Trying to connect to {0}:{1}", ip, port);
 	}
 
@@ -90,12 +93,13 @@ public class Client : MonoBehaviour {
 		UI.gameObject.SetActive(false);
 		Debug.Log(string.Format("Client has connected to server with connection id: {0}", netMsg.conn.connectionId));
 		NetworkServer.SetClientReady(netMsg.conn);
+		VRSettings.enabled = true;
 	}
 
 	private void OnDisconnected (NetworkMessage netMsg)
 	{
-		UI.gameObject.SetActive(true);
-		Debug.Log("Client disconnected!");
+		Debug.Log("Client disconnected! Reconnecting");
+		client.Connect(ip, port);
 	}
 
 	private void OnError (NetworkMessage netMsg)

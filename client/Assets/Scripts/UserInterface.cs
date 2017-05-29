@@ -16,11 +16,16 @@ public class UserInterface : MonoBehaviour {
 	private Text waitingForClientText;
 
 	[SerializeField]
+	private Text ipText;
+
+	[SerializeField]
 	private Server server;
 
 	[SerializeField]
 	private VideoPlayer videoPlayer;
 
+	[SerializeField]
+	private float playDelay = 0.35f;
 
 	private void Awake () 
 	{
@@ -30,6 +35,8 @@ public class UserInterface : MonoBehaviour {
 		resetButton.onClick.AddListener(OnResetButtonClicked);
 		resetButton.gameObject.SetActive(false);
 		playVideoButton.gameObject.SetActive(false);
+
+		ipText.text =  string.Format("Your ip is: {0}", Network.player.ipAddress);
 	}
 
 	private void OnClientConnected ()
@@ -48,6 +55,13 @@ public class UserInterface : MonoBehaviour {
 	private void OnPlayButtonClicked ()
 	{
 		server.SendPlayVideo();
+		StartCoroutine(PlayVideoAfterDelay());
+
+	}
+
+	private IEnumerator PlayVideoAfterDelay ()
+	{
+		yield return new WaitForSeconds(playDelay);
 		videoPlayer.Play();
 		resetButton.gameObject.SetActive(true);
 	}
@@ -57,7 +71,9 @@ public class UserInterface : MonoBehaviour {
 		server.SendReset();
 		videoPlayer.Stop();
 
+
 		playVideoButton.gameObject.SetActive(true);
+		resetButton.gameObject.SetActive(false);
 	}
 	
 	// Update is called once per frame

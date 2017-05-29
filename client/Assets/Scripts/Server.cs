@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System;
 using UnityEngine.Assertions;
+using UnityEngine.VR;
 
 public class Server : MonoBehaviour {
 
@@ -19,6 +20,8 @@ public class Server : MonoBehaviour {
 
 	private void Awake()
 	{
+		VRSettings.enabled = false;
+
 		Debug.Log("initialize server to listen on : " + port);
 		server = new NetworkServerSimple();
 		server.Listen(port);
