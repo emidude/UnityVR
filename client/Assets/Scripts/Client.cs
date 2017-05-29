@@ -116,7 +116,8 @@ public class Client : MonoBehaviour {
 
 	private void OnRestartClient (NetworkMessage netMsg)
 	{
-		videoPlayer.Stop();
+		PlayLoopVideo();
+
 	}
 
 	private void OnDestroy()

@@ -61,12 +61,18 @@ public class Server : MonoBehaviour {
 
 	private void Update()
 	{
-		server.Update();
+		if(server != null)
+		{
+			server.Update();
+		}
 	}
 
 	private void OnDestroy()
 	{
-		server.Stop();
+		if(server != null)
+		{
+			server.Stop();
+		}
 	}
 
 	public void SendPlayVideo()
