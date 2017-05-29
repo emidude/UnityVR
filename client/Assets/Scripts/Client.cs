@@ -57,6 +57,7 @@ public class Client : MonoBehaviour {
 
 	private void PlayLoopVideo ()
 	{
+		videoPlayer.Stop ();
 		videoPlayer.clip = loopVideo;
 		videoPlayer.isLooping = true;
 		videoPlayer.Play();
@@ -64,6 +65,7 @@ public class Client : MonoBehaviour {
 
 	private void PlayExperienceVideo ()
 	{
+		videoPlayer.Stop ();
 		videoPlayer.clip = experienceVideo;
 		videoPlayer.isLooping = false;
 		videoPlayer.Play();
