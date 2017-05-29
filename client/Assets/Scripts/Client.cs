@@ -75,6 +75,8 @@ public class Client : MonoBehaviour {
 
 	private IEnumerator ChangeToLoopWhenFinished ()
 	{
+		yield return new WaitForSeconds(1.0f);
+
 		while(videoPlayer.isPlaying)
 		{
 			yield return new WaitForEndOfFrame();
