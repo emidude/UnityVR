@@ -7,9 +7,6 @@ using UnityEngine.Video;
 
 public class Client : MonoBehaviour {
 
-	public Action OnPlayVideo;
-	public Action OnRestart;
-
 	[SerializeField]
 	private string ip;
 
@@ -69,10 +66,7 @@ public class Client : MonoBehaviour {
 
 	private void OnRestartClient (NetworkMessage netMsg)
 	{
-		if(OnRestart != null)
-		{
-			OnRestart();
-		}
+		videoPlayer.Stop();
 	}
 
 	private void OnDestroy()
