@@ -42,6 +42,14 @@ public class UserInterface : MonoBehaviour {
 		ipText.text =  string.Format("Your ip is: {0}", Network.player.ipAddress);
 	}
 
+	private void Update()
+	{
+		if(server.Delay > 0f)
+		{
+			delayText.text = Mathf.RoundToInt(server.Delay * 1000) + " ms";
+		}
+	}
+
 	private void OnClientConnected ()
 	{
 		waitingForClientText.gameObject.SetActive(false);
@@ -58,17 +66,10 @@ public class UserInterface : MonoBehaviour {
 	private void OnPlayButtonClicked ()
 	{
 		server.SendPlayVideo();
-		StartCoroutine(PlayVideoAfterDelay());
-
-	}
-
-	private IEnumerator PlayVideoAfterDelay ()
-	{
-		yield return new WaitForSeconds(playDelay);
 		videoPlayer.Play();
 		resetButton.gameObject.SetActive(true);
 	}
-
+		
 	private void OnResetButtonClicked ()
 	{
 		server.SendReset();
@@ -77,10 +78,5 @@ public class UserInterface : MonoBehaviour {
 
 		playVideoButton.gameObject.SetActive(true);
 		resetButton.gameObject.SetActive(false);
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
 	}
 }

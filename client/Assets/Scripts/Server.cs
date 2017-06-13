@@ -13,11 +13,16 @@ public class Server : MonoBehaviour {
 	public Action OnClientDisconnected;
 
 	[SerializeField]
+	private float acceptableDelay = 0.1f;
+
+	[SerializeField]
+	private float videoSpeedUpMultiplier = 1.1f;
+
+	[SerializeField]
 	private int port;
 
 	[SerializeField]
 	private VideoPlayer videoPlayer;
-
 
 	private NetworkServerSimple server;
 
@@ -33,8 +38,15 @@ public class Server : MonoBehaviour {
 		get; private set;
 	}
 
+	public  float Delay
+	{
+		get; private set;
+	}
+
 	private void Awake()
 	{
+		Delay = 0f;
+
 		VRSettings.enabled = false;
 
 		Debug.Log("initialize server to listen on : " + port);
@@ -156,7 +168,31 @@ public class Server : MonoBehaviour {
 	private void OnSyncVideoPlaybackTime (NetworkMessage netMsg)
 	{
 		SyncVideoPlaybackTimeMessage message = netMsg.reader.ReadMessage<SyncVideoPlaybackTimeMessage>();
-		float difference = message.Time + Latency - (float)videoPlayer.time;
-		Debug.Log("difference is " + difference);
+
+		Delay = (float)videoPlayer.time - (message.Time + Latency);
+
+		videoPlayer.playbackSpeed = 1.0f;
+
+		Debug.Log("delay between server and client is " + Delay);
+
+		if(Delay > acceptableDelay)
+		{
+			StartCoroutine(PauseToSync(Delay));
+		}
+
+		if(Delay < -acceptableDelay)
+		{
+			Debug.Log("speeding up the video to catch up to client");
+			videoPlayer.playbackSpeed = videoSpeedUpMultiplier;
+		}
+	}
+
+	private IEnumerator PauseToSync (float delay)
+	{
+		Debug.Log("pause for " + delay);
+		videoPlayer.Pause();
+		yield return new WaitForSeconds(delay);
+		videoPlayer.Play();
+		Debug.Log("resume");
 	}
 }
