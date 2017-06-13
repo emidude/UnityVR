@@ -18,6 +18,13 @@ public class Server : MonoBehaviour {
 
 	private NetworkConnection clientConnection;
 
+	private float timePingSent;
+	private bool waitingForPingResponse = false;
+	private List<float> pingTimes = new List<float>();
+
+	private float latency = 0f;
+
+
 	private void Awake()
 	{
 		VRSettings.enabled = false;
@@ -28,6 +35,7 @@ public class Server : MonoBehaviour {
 
 		server.RegisterHandler(MsgType.Connect, OnServerConnect);
 		server.RegisterHandler(MsgType.Disconnect, OnServerDisonnect);
+		server.RegisterHandler(CustomMsgType.Ping, OnPingResponse);
 	
 	}
 		
@@ -43,10 +51,48 @@ public class Server : MonoBehaviour {
 
 		clientConnection = netMsg.conn;
 
+		StartCoroutine(DetermineLatency());
+
 		if(OnClientConnected != null)
 		{
 			OnClientConnected();
 		}
+	}
+
+	private IEnumerator DetermineLatency ()
+	{
+		int numSamples = 5;
+
+		while(numSamples > 0)
+		{
+			if(waitingForPingResponse)
+			{
+				yield return new WaitForEndOfFrame();
+			}
+			else 
+			{
+				numSamples--;
+				timePingSent = Time.time;
+				clientConnection.Send(CustomMsgType.Ping, new PingMessage());
+			}
+		}
+
+		for(int i = 0; i < pingTimes.Count; i++)
+		{
+			latency += pingTimes[i];
+		}
+
+		latency /= pingTimes.Count;
+
+		Debug.Log("latency: " + latency*1000);
+	}
+
+	private void OnPingResponse (NetworkMessage netMsg)
+	{
+		waitingForPingResponse = false;
+		float pingTime = Time.time - timePingSent;
+		Debug.Log("Ping " + pingTime*1000);
+		pingTimes.Add(pingTime);
 	}
 
 	private void OnServerDisonnect (NetworkMessage netMsg)

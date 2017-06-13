@@ -45,6 +45,8 @@ public class Client : MonoBehaviour {
 		client.RegisterHandler(MsgType.Error, OnError);
 		client.RegisterHandler(CustomMsgType.ReadyToPlay, OnReadyToPlay);
 		client.RegisterHandler(CustomMsgType.RestartClient, OnRestartClient);
+		client.RegisterHandler(CustomMsgType.Ping, OnPing);
+
 
 		connectButton.onClick.AddListener(OnConnectButtonClicked);
 
@@ -126,6 +128,12 @@ public class Client : MonoBehaviour {
 	{
 		PlayLoopVideo();
 
+	}
+
+	private void OnPing (NetworkMessage netMsg)
+	{
+		Debug.Log("ping in client received.");
+		client.Send(CustomMsgType.Ping, new PingMessage());
 	}
 
 	private void OnDestroy()
