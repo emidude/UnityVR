@@ -30,6 +30,9 @@ public class Client : MonoBehaviour {
 	[SerializeField]
 	private Button connectButton;
 
+	[SerializeField]
+	private int syncEveryXFrames = 60;
+
 	private NetworkClient client;
 
 	private string ip;
@@ -81,9 +84,15 @@ public class Client : MonoBehaviour {
 	private IEnumerator ChangeToLoopWhenFinished ()
 	{
 		yield return new WaitForSeconds(1.0f);
-
+		int numFramesPassed = 0;
+	
 		while(videoPlayer.isPlaying)
 		{
+			if(++numFramesPassed % syncEveryXFrames == 0)
+			{
+				numFramesPassed = 0;
+				SendVideoSyncPlaybackTime((float)videoPlayer.time);
+			}
 			yield return new WaitForEndOfFrame();
 		}
 
@@ -138,5 +147,10 @@ public class Client : MonoBehaviour {
 
 	private void OnDestroy()
 	{
+	}
+
+	public void SendVideoSyncPlaybackTime(float time)
+	{
+		client.Send(CustomMsgType.SyncVideoPlaybackTime, new SyncVideoPlaybackTimeMessage(time));
 	}
 }

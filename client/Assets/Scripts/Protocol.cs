@@ -9,6 +9,7 @@ public class CustomMsgType
 	public const short RestartClient = 101;
 	public const short Ping = 102;
 	public const short Pong = 103;
+	public const short SyncVideoPlaybackTime = 104;
 }
 
 public class ReadyToPlayVideoMessage : MessageBase 
@@ -25,4 +26,17 @@ public class PingMessage : MessageBase
 
 public class PongMessage : MessageBase 
 {
+}
+
+public class SyncVideoPlaybackTimeMessage : MessageBase 
+{
+	public readonly float Time;
+
+	public SyncVideoPlaybackTimeMessage()
+	{}
+
+	public SyncVideoPlaybackTimeMessage(float time)
+	{
+		this.Time = time;
+	}
 }

@@ -19,6 +19,9 @@ public class UserInterface : MonoBehaviour {
 	private Text ipText;
 
 	[SerializeField]
+	private Text delayText;
+
+	[SerializeField]
 	private Server server;
 
 	[SerializeField]

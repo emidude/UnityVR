@@ -5,6 +5,7 @@ using UnityEngine.Networking;
 using System;
 using UnityEngine.Assertions;
 using UnityEngine.VR;
+using UnityEngine.Video;
 
 public class Server : MonoBehaviour {
 
@@ -13,6 +14,10 @@ public class Server : MonoBehaviour {
 
 	[SerializeField]
 	private int port;
+
+	[SerializeField]
+	private VideoPlayer videoPlayer;
+
 
 	private NetworkServerSimple server;
 
@@ -39,7 +44,8 @@ public class Server : MonoBehaviour {
 		server.RegisterHandler(MsgType.Connect, OnServerConnect);
 		server.RegisterHandler(MsgType.Disconnect, OnServerDisonnect);
 		server.RegisterHandler(CustomMsgType.Pong, OnPongResponse);
-	
+		server.RegisterHandler(CustomMsgType.SyncVideoPlaybackTime, OnSyncVideoPlaybackTime);
+
 	}
 		
 	private void OnServerConnect(NetworkMessage netMsg)
@@ -84,7 +90,7 @@ public class Server : MonoBehaviour {
 	private void OnPongResponse (NetworkMessage netMsg)
 	{
 		waitingForPingResponse = false;
-		float pingTime = Time.time - timePingSent;
+		float pingTime = (Time.time - timePingSent)/2;
 		Debug.Log("Ping " + pingTime*1000);
 		pingTimes.Add(pingTime);
 
@@ -145,5 +151,12 @@ public class Server : MonoBehaviour {
 	public void SendReset ()
 	{
 		clientConnection.Send(CustomMsgType.RestartClient, new RestartClientMessage());
+	}
+
+	private void OnSyncVideoPlaybackTime (NetworkMessage netMsg)
+	{
+		SyncVideoPlaybackTimeMessage message = netMsg.reader.ReadMessage<SyncVideoPlaybackTimeMessage>();
+		float difference = message.Time + Latency - (float)videoPlayer.time;
+		Debug.Log("difference is " + difference);
 	}
 }

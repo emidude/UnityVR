@@ -24,11 +24,20 @@ VideoClipImporter:
   importAudio: 1
   sourceAudioChannelCount: 0200
   sourceAudioSampleRate: 44ac0000
-  targetSettings: {}
+  targetSettings:
+    0:
+      enableTranscoding: 1
+      codec: 0
+      resizeFormat: 0
+      aspectRatio: 0
+      customWidth: 1280
+      customHeight: 720
+      bitrateMode: 2
+      spatialQuality: 2
   output:
     format: 0
     settings:
-      enableTranscoding: 0
+      enableTranscoding: 1
       codec: 0
       resizeFormat: 0
       aspectRatio: 0
@@ -39,11 +48,11 @@ VideoClipImporter:
     encodedWidth: 1280
     encodedHeight: 720
     encodedStartFrame: 0
-    encodedEndFrame: 10271
+    encodedEndFrame: 10261
     streamedResource:
-      source: 
+      source: library/metadata/72/72ab3364ecb1042bbb88b84b69f1edfc.resource
       offset: 0
-      size: 64451160
+      size: 157559733
   userData: 
   assetBundleName: 
   assetBundleVariant: 
