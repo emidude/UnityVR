@@ -35,7 +35,7 @@ public class Server : MonoBehaviour {
 
 		server.RegisterHandler(MsgType.Connect, OnServerConnect);
 		server.RegisterHandler(MsgType.Disconnect, OnServerDisonnect);
-		server.RegisterHandler(CustomMsgType.Ping, OnPingResponse);
+		server.RegisterHandler(CustomMsgType.Pong, OnPongResponse);
 	
 	}
 		
@@ -74,8 +74,11 @@ public class Server : MonoBehaviour {
 				numSamples--;
 				timePingSent = Time.time;
 				clientConnection.Send(CustomMsgType.Ping, new PingMessage());
+				yield return new WaitForEndOfFrame();
 			}
 		}
+
+		latency = 0f;
 
 		for(int i = 0; i < pingTimes.Count; i++)
 		{
@@ -87,7 +90,7 @@ public class Server : MonoBehaviour {
 		Debug.Log("latency: " + latency*1000);
 	}
 
-	private void OnPingResponse (NetworkMessage netMsg)
+	private void OnPongResponse (NetworkMessage netMsg)
 	{
 		waitingForPingResponse = false;
 		float pingTime = Time.time - timePingSent;

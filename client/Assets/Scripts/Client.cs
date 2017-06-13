@@ -133,7 +133,7 @@ public class Client : MonoBehaviour {
 	private void OnPing (NetworkMessage netMsg)
 	{
 		Debug.Log("ping in client received.");
-		client.Send(CustomMsgType.Ping, new PingMessage());
+		client.Send(CustomMsgType.Pong, new PongMessage());
 	}
 
 	private void OnDestroy()

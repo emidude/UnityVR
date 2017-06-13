@@ -8,6 +8,7 @@ public class CustomMsgType
 	public const short ReadyToPlay = 100;
 	public const short RestartClient = 101;
 	public const short Ping = 102;
+	public const short Pong = 103;
 }
 
 public class ReadyToPlayVideoMessage : MessageBase 
@@ -19,5 +20,9 @@ public class RestartClientMessage : MessageBase
 }
 
 public class PingMessage : MessageBase 
+{
+}
+
+public class PongMessage : MessageBase 
 {
 }
