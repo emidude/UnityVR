@@ -20,10 +20,13 @@ public class Server : MonoBehaviour {
 
 	private float timePingSent;
 	private bool waitingForPingResponse = false;
+	private bool latencySequenceFinished = false;
 	private List<float> pingTimes = new List<float>();
 
-	private float latency = 0f;
-
+	public  float Latency
+	{
+		get; private set;
+	}
 
 	private void Awake()
 	{
@@ -52,15 +55,11 @@ public class Server : MonoBehaviour {
 		clientConnection = netMsg.conn;
 
 		StartCoroutine(DetermineLatency());
-
-		if(OnClientConnected != null)
-		{
-			OnClientConnected();
-		}
 	}
 
 	private IEnumerator DetermineLatency ()
 	{
+		latencySequenceFinished = false;
 		int numSamples = 5;
 
 		while(numSamples > 0)
@@ -74,20 +73,12 @@ public class Server : MonoBehaviour {
 				numSamples--;
 				timePingSent = Time.time;
 				clientConnection.Send(CustomMsgType.Ping, new PingMessage());
+				waitingForPingResponse = true;
 				yield return new WaitForEndOfFrame();
 			}
 		}
 
-		latency = 0f;
-
-		for(int i = 0; i < pingTimes.Count; i++)
-		{
-			latency += pingTimes[i];
-		}
-
-		latency /= pingTimes.Count;
-
-		Debug.Log("latency: " + latency*1000);
+		latencySequenceFinished = true;
 	}
 
 	private void OnPongResponse (NetworkMessage netMsg)
@@ -96,6 +87,25 @@ public class Server : MonoBehaviour {
 		float pingTime = Time.time - timePingSent;
 		Debug.Log("Ping " + pingTime*1000);
 		pingTimes.Add(pingTime);
+
+		if(latencySequenceFinished)
+		{
+			Latency = 0f;
+
+			for(int i = 0; i < pingTimes.Count; i++)
+			{
+				Latency += pingTimes[i];
+			}
+
+			Latency /= pingTimes.Count;
+
+			Debug.Log("latency: " + Latency*1000);
+
+			if(OnClientConnected != null)
+			{
+				OnClientConnected();
+			}
+		}
 	}
 
 	private void OnServerDisonnect (NetworkMessage netMsg)
