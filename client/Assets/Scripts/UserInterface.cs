@@ -27,9 +27,6 @@ public class UserInterface : MonoBehaviour {
 	[SerializeField]
 	private VideoPlayer videoPlayer;
 
-	[SerializeField]
-	private float playDelay = 0.35f;
-
 	private void Awake () 
 	{
 		server.OnClientConnected += OnClientConnected;
