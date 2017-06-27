@@ -24,6 +24,10 @@ public class Server : MonoBehaviour {
 	[SerializeField]
 	private VideoPlayer videoPlayer;
 
+	//DECLARED AUDIO SOURCE
+	[SerializeField]
+	private AudioSource audioSource;
+
 	private NetworkServerSimple server;
 
 	private NetworkConnection clientConnection;
@@ -32,6 +36,8 @@ public class Server : MonoBehaviour {
 	private bool waitingForPingResponse = false;
 	private bool latencySequenceFinished = false;
 	private List<float> pingTimes = new List<float>();
+
+	private bool isPlayingExperienceVideo = false;
 
 	public  float Latency
 	{
@@ -45,6 +51,7 @@ public class Server : MonoBehaviour {
 
 	private void Awake()
 	{
+
 		Delay = 0f;
 
 		VRSettings.enabled = false;
@@ -57,6 +64,18 @@ public class Server : MonoBehaviour {
 		server.RegisterHandler(MsgType.Disconnect, OnServerDisonnect);
 		server.RegisterHandler(CustomMsgType.Pong, OnPongResponse);
 		server.RegisterHandler(CustomMsgType.SyncVideoPlaybackTime, OnSyncVideoPlaybackTime);
+
+		//Add AudioSource
+		audioSource = gameObject.AddComponent<AudioSource>();
+
+		//Set Audio Output to AudioSource
+		videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
+
+		//Assign the Audio from Video to AudioSource to be played
+		videoPlayer.EnableAudioTrack(0, true);
+		videoPlayer.SetTargetAudioSource(0, audioSource);
+
+
 
 	}
 		
@@ -77,6 +96,7 @@ public class Server : MonoBehaviour {
 
 	private IEnumerator DetermineLatency ()
 	{
+		yield return new WaitForSeconds (0.1f);
 		latencySequenceFinished = false;
 		int numSamples = 5;
 
@@ -89,7 +109,11 @@ public class Server : MonoBehaviour {
 			else 
 			{
 				numSamples--;
-				timePingSent = Time.time;
+
+				/////////////////////////////////////
+				/// Debu
+				Debug.Log("sending ping message");
+				timePingSent = Time.realtimeSinceStartup;
 				clientConnection.Send(CustomMsgType.Ping, new PingMessage());
 				waitingForPingResponse = true;
 				yield return new WaitForEndOfFrame();
@@ -102,7 +126,8 @@ public class Server : MonoBehaviour {
 	private void OnPongResponse (NetworkMessage netMsg)
 	{
 		waitingForPingResponse = false;
-		float pingTime = (Time.time - timePingSent)/2;
+		//////////////////////////////////////////
+		float pingTime = (Time.realtimeSinceStartup - timePingSent)/2;
 		Debug.Log("Ping " + pingTime*1000);
 		pingTimes.Add(pingTime);
 
@@ -137,6 +162,7 @@ public class Server : MonoBehaviour {
 
 		Assert.AreEqual(netMsg.conn, clientConnection);
 		clientConnection = null;
+		isPlayingExperienceVideo = false;
 	}
 
 	private void Update()
@@ -158,15 +184,21 @@ public class Server : MonoBehaviour {
 	public void SendPlayVideo()
 	{
 		clientConnection.Send(CustomMsgType.ReadyToPlay, new ReadyToPlayVideoMessage());
+		isPlayingExperienceVideo = true;
 	}
 
 	public void SendReset ()
 	{
 		clientConnection.Send(CustomMsgType.RestartClient, new RestartClientMessage());
+		isPlayingExperienceVideo = false;
 	}
 
 	private void OnSyncVideoPlaybackTime (NetworkMessage netMsg)
 	{
+		if (!isPlayingExperienceVideo) 
+		{
+			return;
+		}
 		SyncVideoPlaybackTimeMessage message = netMsg.reader.ReadMessage<SyncVideoPlaybackTimeMessage>();
 
 		Delay = (float)videoPlayer.time - (message.Time + Latency);
@@ -175,15 +207,18 @@ public class Server : MonoBehaviour {
 
 		Debug.Log("delay between server and client is " + Delay);
 
-		if(Delay > acceptableDelay)
+		if(Delay > acceptableDelay && videoPlayer.isPlaying)
 		{
 			StartCoroutine(PauseToSync(Delay));
 		}
 
 		if(Delay < -acceptableDelay)
 		{
-			Debug.Log("speeding up the video to catch up to client");
-			videoPlayer.playbackSpeed = videoSpeedUpMultiplier;
+			
+			float speed = 1.0f + Mathf.Abs (Delay) * videoSpeedUpMultiplier;
+			Debug.Log("speeding up the video to catch up to client. Speed = " + speed);
+			videoPlayer.playbackSpeed = speed;
+
 		}
 	}
 

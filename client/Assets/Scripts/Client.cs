@@ -21,6 +21,11 @@ public class Client : MonoBehaviour {
 	[SerializeField]
 	private VideoPlayer videoPlayer;
 
+	//DECLARED AUDIO SOURCE
+	[SerializeField]
+	private AudioSource audioSource;
+
+
 	[SerializeField]
 	private Canvas UI;
 
@@ -50,6 +55,15 @@ public class Client : MonoBehaviour {
 		client.RegisterHandler(CustomMsgType.RestartClient, OnRestartClient);
 		client.RegisterHandler(CustomMsgType.Ping, OnPing);
 
+				//Add AudioSource
+				audioSource = gameObject.AddComponent<AudioSource>();
+				
+				//Set Audio Output to AudioSource
+				videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
+				
+				//Assign the Audio from Video to AudioSource to be played
+				videoPlayer.EnableAudioTrack(0, true);
+				videoPlayer.SetTargetAudioSource(0, audioSource);
 
 		connectButton.onClick.AddListener(OnConnectButtonClicked);
 
@@ -65,6 +79,17 @@ public class Client : MonoBehaviour {
 
 	private void PlayLoopVideo ()
 	{
+
+//		//Add AudioSource
+//		audioSource = gameObject.AddComponent<AudioSource>();
+//		
+//		//Set Audio Output to AudioSource
+//		videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
+//		
+//		//Assign the Audio from Video to AudioSource to be played
+//		videoPlayer.EnableAudioTrack(0, true);
+//		videoPlayer.SetTargetAudioSource(0, audioSource);
+
 		videoPlayer.Stop ();
 		videoPlayer.clip = loopVideo;
 		videoPlayer.isLooping = true;
@@ -121,6 +146,8 @@ public class Client : MonoBehaviour {
 	private void OnServerDisonnect (NetworkMessage netMsg)
 	{
 		UI.gameObject.SetActive(true);
+		StopAllCoroutines ();
+		PlayLoopVideo();
 		Debug.Log("disconnect!");
 
 	}

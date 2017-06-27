@@ -41,10 +41,7 @@ public class UserInterface : MonoBehaviour {
 
 	private void Update()
 	{
-		if(server.Delay > 0f)
-		{
-			delayText.text = Mathf.RoundToInt(server.Delay * 1000) + " ms";
-		}
+		delayText.text = Mathf.RoundToInt(server.Delay * 1000) + " ms";
 	}
 
 	private void OnClientConnected ()
