@@ -58,15 +58,19 @@ public class Client : MonoBehaviour {
 		client.RegisterHandler(CustomMsgType.Ping, OnPing);
 		client.RegisterHandler (CustomMsgType.ResetOrientation, OnResetOrientation);
 
-		//Add AudioSource
-		audioSource = gameObject.AddComponent<AudioSource>();
-		
+		#if UNITY_IOS
+		videoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
+		#else 
 		//Set Audio Output to AudioSource
+		audioSource = gameObject.AddComponent<AudioSource>();
 		videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
+		videoPlayer.SetTargetAudioSource(0, audioSource);
+		#endif
+
 		
 		//Assign the Audio from Video to AudioSource to be played
 		videoPlayer.EnableAudioTrack(0, true);
-		videoPlayer.SetTargetAudioSource(0, audioSource);
+
 
 		connectButton.onClick.AddListener(OnConnectButtonClicked);
 
@@ -188,5 +192,6 @@ public class Client : MonoBehaviour {
 	private void OnResetOrientation(NetworkMessage netMsg)
 	{
 		InputTracking.Recenter ();
+		Debug.Log ("recenter orientation!");
 	}
 }
