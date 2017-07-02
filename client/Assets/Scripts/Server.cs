@@ -51,6 +51,7 @@ public class Server : MonoBehaviour {
 
 	private void Awake()
 	{
+		Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
 		Delay = 0f;
 
@@ -200,7 +201,8 @@ public class Server : MonoBehaviour {
 			return;
 		}
 		SyncVideoPlaybackTimeMessage message = netMsg.reader.ReadMessage<SyncVideoPlaybackTimeMessage>();
-
+	//	StartCoroutine(DetermineLatency());
+		//Delay = (float)videoPlayer.time - (message.Time);
 		Delay = (float)videoPlayer.time - (message.Time + Latency);
 
 		videoPlayer.playbackSpeed = 1.0f;

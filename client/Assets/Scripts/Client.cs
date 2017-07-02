@@ -46,6 +46,8 @@ public class Client : MonoBehaviour {
 	{
 		VRSettings.enabled = false;
 
+		Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
 		client = new NetworkClient();
 
 		client.RegisterHandler(MsgType.Connect, OnConnected);
