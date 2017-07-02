@@ -56,16 +56,17 @@ public class Client : MonoBehaviour {
 		client.RegisterHandler(CustomMsgType.ReadyToPlay, OnReadyToPlay);
 		client.RegisterHandler(CustomMsgType.RestartClient, OnRestartClient);
 		client.RegisterHandler(CustomMsgType.Ping, OnPing);
+		client.RegisterHandler (CustomMsgType.ResetOrientation, OnResetOrientation);
 
-				//Add AudioSource
-				audioSource = gameObject.AddComponent<AudioSource>();
-				
-				//Set Audio Output to AudioSource
-				videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
-				
-				//Assign the Audio from Video to AudioSource to be played
-				videoPlayer.EnableAudioTrack(0, true);
-				videoPlayer.SetTargetAudioSource(0, audioSource);
+		//Add AudioSource
+		audioSource = gameObject.AddComponent<AudioSource>();
+		
+		//Set Audio Output to AudioSource
+		videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
+		
+		//Assign the Audio from Video to AudioSource to be played
+		videoPlayer.EnableAudioTrack(0, true);
+		videoPlayer.SetTargetAudioSource(0, audioSource);
 
 		connectButton.onClick.AddListener(OnConnectButtonClicked);
 
@@ -181,5 +182,11 @@ public class Client : MonoBehaviour {
 	public void SendVideoSyncPlaybackTime(float time)
 	{
 		client.Send(CustomMsgType.SyncVideoPlaybackTime, new SyncVideoPlaybackTimeMessage(time));
+	}
+
+
+	private void OnResetOrientation(NetworkMessage netMsg)
+	{
+		InputTracking.Recenter ();
 	}
 }

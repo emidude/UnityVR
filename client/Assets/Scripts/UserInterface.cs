@@ -27,14 +27,20 @@ public class UserInterface : MonoBehaviour {
 	[SerializeField]
 	private VideoPlayer videoPlayer;
 
+	[SerializeField]
+	private Button resetOrientationButton;
+
 	private void Awake () 
 	{
 		server.OnClientConnected += OnClientConnected;
 		server.OnClientDisconnected += OnClientDisconnected;
 		playVideoButton.onClick.AddListener(OnPlayButtonClicked);
 		resetButton.onClick.AddListener(OnResetButtonClicked);
+		resetOrientationButton.onClick.AddListener(OnResetAudienceOrientationButtonClicked);
+
 		resetButton.gameObject.SetActive(false);
 		playVideoButton.gameObject.SetActive(false);
+		resetOrientationButton.gameObject.SetActive (false);
 
 		ipText.text =  string.Format("Your ip is: {0}", Network.player.ipAddress);
 	}
@@ -48,6 +54,7 @@ public class UserInterface : MonoBehaviour {
 	{
 		waitingForClientText.gameObject.SetActive(false);
 		playVideoButton.gameObject.SetActive(true);
+		resetOrientationButton.gameObject.SetActive (true);
 
 	}
 
@@ -55,6 +62,7 @@ public class UserInterface : MonoBehaviour {
 	{
 		waitingForClientText.gameObject.SetActive(true);
 		playVideoButton.gameObject.SetActive(false);
+		resetOrientationButton.gameObject.SetActive (false);
 	}
 
 	private void OnPlayButtonClicked ()
@@ -72,5 +80,10 @@ public class UserInterface : MonoBehaviour {
 
 		playVideoButton.gameObject.SetActive(true);
 		resetButton.gameObject.SetActive(false);
+	}
+
+	private void OnResetAudienceOrientationButtonClicked()
+	{
+		server.SendRestartOrientationMessage ();
 	}
 }

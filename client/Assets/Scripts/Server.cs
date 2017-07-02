@@ -216,11 +216,9 @@ public class Server : MonoBehaviour {
 
 		if(Delay < -acceptableDelay)
 		{
-			
 			float speed = 1.0f + Mathf.Abs (Delay) * videoSpeedUpMultiplier;
 			Debug.Log("speeding up the video to catch up to client. Speed = " + speed);
 			videoPlayer.playbackSpeed = speed;
-
 		}
 	}
 
@@ -231,5 +229,10 @@ public class Server : MonoBehaviour {
 		yield return new WaitForSeconds(delay);
 		videoPlayer.Play();
 		Debug.Log("resume");
+	}
+
+	public void SendRestartOrientationMessage()
+	{
+		clientConnection.Send (CustomMsgType.ResetOrientation, new ResetOrientationMessage ());
 	}
 }
