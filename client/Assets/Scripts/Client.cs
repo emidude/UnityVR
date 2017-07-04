@@ -25,6 +25,12 @@ public class Client : MonoBehaviour {
 	[SerializeField]
 	private AudioSource audioSource;
 
+	//DECLARED AUDIO SOURCE 2
+	[SerializeField]
+	public AudioSource audioSource2;
+
+	//[Serialize Field]
+	public  AudioClip audio;
 
 	[SerializeField]
 	private Canvas UI;
@@ -62,14 +68,18 @@ public class Client : MonoBehaviour {
 		videoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
 		#else 
 		//Set Audio Output to AudioSource
-		audioSource = gameObject.AddComponent<AudioSource>();
-		videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
-		videoPlayer.SetTargetAudioSource(0, audioSource);
+//		audioSource = gameObject.AddComponent<AudioSource>();
+//		videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
+//		videoPlayer.SetTargetAudioSource(0, audioSource);
+
+		audioSource2 = gameObject.AddComponent<AudioSource>();
+		audioSource2.clip = audio; 
+
 		#endif
 
 		
 		//Assign the Audio from Video to AudioSource to be played
-		videoPlayer.EnableAudioTrack(0, true);
+		//videoPlayer.EnableAudioTrack(0, true);
 
 
 		connectButton.onClick.AddListener(OnConnectButtonClicked);
@@ -97,6 +107,7 @@ public class Client : MonoBehaviour {
 //		videoPlayer.EnableAudioTrack(0, true);
 //		videoPlayer.SetTargetAudioSource(0, audioSource);
 
+		audioSource2.Stop ();
 		videoPlayer.Stop ();
 		videoPlayer.clip = loopVideo;
 		videoPlayer.isLooping = true;
@@ -105,9 +116,11 @@ public class Client : MonoBehaviour {
 
 	private void PlayExperienceVideo ()
 	{
+		audioSource2.Stop ();
 		videoPlayer.Stop ();
 		videoPlayer.clip = experienceVideo;
 		videoPlayer.isLooping = false;
+		audioSource2.Play();
 		videoPlayer.Play();
 
 		StartCoroutine(ChangeToLoopWhenFinished());
