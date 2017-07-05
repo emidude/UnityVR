@@ -42,7 +42,7 @@ public class Client : MonoBehaviour {
 	private Button connectButton;
 
 	[SerializeField]
-	private int syncEveryXFrames = 60;
+	private int syncEveryXFrames = 200;
 
 	private NetworkClient client;
 
