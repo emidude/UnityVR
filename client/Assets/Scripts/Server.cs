@@ -166,7 +166,6 @@ public class Server : MonoBehaviour {
 
 		Assert.AreEqual(netMsg.conn, clientConnection);
 		clientConnection = null;
-		isPlayingExperienceVideo = false;
 	}
 
 	private void Update()
