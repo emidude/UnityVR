@@ -48,6 +48,8 @@ public class Client : MonoBehaviour {
 
 	private string ip;
 
+	private bool playingExperienceVideo = false;
+
 	private void Awake()
 	{
 		Application.runInBackground = true;
@@ -108,7 +110,7 @@ public class Client : MonoBehaviour {
 
 	private void PlayLoopVideo ()
 	{
-
+		playingExperienceVideo = false;
 //		//Add AudioSource
 //		audioSource = gameObject.AddComponent<AudioSource>();
 //		
@@ -128,6 +130,7 @@ public class Client : MonoBehaviour {
 
 	private void PlayExperienceVideo ()
 	{
+		playingExperienceVideo = true;
 		audioSource2.Stop ();
 		videoPlayer.Stop ();
 		videoPlayer.clip = experienceVideo;
@@ -165,6 +168,13 @@ public class Client : MonoBehaviour {
 		UI.gameObject.SetActive(false);
 		NetworkServer.SetClientReady(netMsg.conn);
 		VRSettings.enabled = true;
+
+		if(playingExperienceVideo)
+		{
+			Debug.Log("was playing experience video so start syncing again");
+			StopAllCoroutines();
+			StartCoroutine(ChangeToLoopWhenFinished());
+		}
 	}
 
 	private void OnDisconnected (NetworkMessage netMsg)
