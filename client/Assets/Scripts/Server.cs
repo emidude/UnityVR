@@ -51,6 +51,7 @@ public class Server : MonoBehaviour {
 
 	private void Awake()
 	{
+		Application.runInBackground = true;
 		Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
 		Delay = 0f;
@@ -82,6 +83,8 @@ public class Server : MonoBehaviour {
 		
 	private void OnServerConnect(NetworkMessage netMsg)
 	{
+		Debug.Log(string.Format("Client trying to connect connection id: {0}", netMsg.conn.connectionId));
+
 		if(clientConnection != null)
 		{
 			Debug.LogWarning("there's already one client connected, ignoring");
@@ -196,7 +199,7 @@ public class Server : MonoBehaviour {
 
 	private void OnSyncVideoPlaybackTime (NetworkMessage netMsg)
 	{
-		if (!isPlayingExperienceVideo) 
+		if (!isPlayingExperienceVideo || !videoPlayer.isPlaying) 
 		{
 			return;
 		}

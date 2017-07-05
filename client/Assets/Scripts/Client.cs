@@ -50,9 +50,9 @@ public class Client : MonoBehaviour {
 
 	private void Awake()
 	{
-		VRSettings.enabled = false;
-
+		Application.runInBackground = true;
 		Screen.sleepTimeout = SleepTimeout.NeverSleep;
+		VRSettings.enabled = false;
 
 		client = new NetworkClient();
 
@@ -90,8 +90,20 @@ public class Client : MonoBehaviour {
 	private void OnConnectButtonClicked ()
 	{
 		ip = ipInput.text;
-		client.Connect(ip, port);
-		Debug.LogFormat("Trying to connect to {0}:{1}", ip, port);
+
+		Debug.LogFormat("OnConnectButtonClicked");
+
+		if(client.isConnected)
+		{
+			Debug.LogFormat("Disconnecting");
+			client.Disconnect();
+		}
+		else 
+		{
+			client.Connect(ip, port);
+			Debug.LogFormat("Trying to connect to {0}:{1}", ip, port);
+		}
+	
 	}
 
 	private void PlayLoopVideo ()
@@ -136,7 +148,10 @@ public class Client : MonoBehaviour {
 			if(++numFramesPassed % syncEveryXFrames == 0)
 			{
 				numFramesPassed = 0;
-				SendVideoSyncPlaybackTime((float)videoPlayer.time);
+				if(client.isConnected)
+				{
+					SendVideoSyncPlaybackTime((float)videoPlayer.time);
+				}
 			}
 			yield return new WaitForEndOfFrame();
 		}
@@ -146,8 +161,8 @@ public class Client : MonoBehaviour {
 
 	private void OnConnected (NetworkMessage netMsg)
 	{
-		UI.gameObject.SetActive(false);
 		Debug.Log(string.Format("Client has connected to server with connection id: {0}", netMsg.conn.connectionId));
+		UI.gameObject.SetActive(false);
 		NetworkServer.SetClientReady(netMsg.conn);
 		VRSettings.enabled = true;
 	}
@@ -161,15 +176,6 @@ public class Client : MonoBehaviour {
 	private void OnError (NetworkMessage netMsg)
 	{
 		Debug.Log("Client error: " + netMsg.ToString());
-	}
-
-	private void OnServerDisonnect (NetworkMessage netMsg)
-	{
-		UI.gameObject.SetActive(true);
-		StopAllCoroutines ();
-		PlayLoopVideo();
-		Debug.Log("disconnect!");
-
 	}
 
 	private void OnReadyToPlay (NetworkMessage netMsg)
