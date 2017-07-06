@@ -216,6 +216,12 @@ public class Server : MonoBehaviour {
 		{
 			return;
 		}
+
+		if(clientConnection == null)
+		{
+			clientConnection = netMsg.conn;
+		}
+
 		SyncVideoPlaybackTimeMessage message = netMsg.reader.ReadMessage<SyncVideoPlaybackTimeMessage>();
 	//	StartCoroutine(DetermineLatency());
 		//Delay = (float)videoPlayer.time - (message.Time);
