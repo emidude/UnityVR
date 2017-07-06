@@ -42,13 +42,17 @@ public class Client : MonoBehaviour {
 	private Button connectButton;
 
 	[SerializeField]
+	private Button throwErrorButton;
+
+
+	[SerializeField]
 	private int syncEveryXFrames = 200;
 
 	private NetworkClient client;
 
 	private string ip;
 
-	private bool playingExperienceVideo = false;
+	private bool connectButtonClicked = false;
 
 	private void Awake()
 	{
@@ -56,15 +60,7 @@ public class Client : MonoBehaviour {
 		Screen.sleepTimeout = SleepTimeout.NeverSleep;
 		VRSettings.enabled = false;
 
-		client = new NetworkClient();
-
-		client.RegisterHandler(MsgType.Connect, OnConnected);
-		client.RegisterHandler(MsgType.Disconnect, OnDisconnected);
-		client.RegisterHandler(MsgType.Error, OnError);
-		client.RegisterHandler(CustomMsgType.ReadyToPlay, OnReadyToPlay);
-		client.RegisterHandler(CustomMsgType.RestartClient, OnRestartClient);
-		client.RegisterHandler(CustomMsgType.Ping, OnPing);
-		client.RegisterHandler (CustomMsgType.ResetOrientation, OnResetOrientation);
+		CreateNetworkClient();
 
 		#if UNITY_IOS
 		videoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
@@ -85,12 +81,13 @@ public class Client : MonoBehaviour {
 
 
 		connectButton.onClick.AddListener(OnConnectButtonClicked);
-
+		throwErrorButton.onClick.AddListener(OnThrowErrorButtonClicked);
 		PlayLoopVideo();
 	}
 
 	private void OnConnectButtonClicked ()
 	{
+		connectButtonClicked = true;
 		ip = ipInput.text;
 
 		Debug.LogFormat("OnConnectButtonClicked");
@@ -110,7 +107,7 @@ public class Client : MonoBehaviour {
 
 	private void PlayLoopVideo ()
 	{
-		playingExperienceVideo = false;
+
 //		//Add AudioSource
 //		audioSource = gameObject.AddComponent<AudioSource>();
 //		
@@ -128,9 +125,69 @@ public class Client : MonoBehaviour {
 		videoPlayer.Play();
 	}
 
+	private  void OnThrowErrorButtonClicked ()
+	{
+		throw new NotImplementedException ();
+	}
+
+	void OnApplicationFocus(bool hasFocus)
+	{
+		Debug.Log("OnApplicationFocus " + hasFocus);
+
+		if(hasFocus && connectButtonClicked)
+		{
+			Debug.Log("reconnect");
+			Reconnect ();
+		}
+	}
+
+	void OnApplicationPause(bool pauseStatus)
+	{
+		Debug.Log("OnApplicationPause " + pauseStatus);
+
+		if(pauseStatus)
+		{
+			Debug.Log("Clearing network client");
+			ClearNetworkClient();
+		}
+	}
+
+	void ClearNetworkClient ()
+	{
+		NetworkClient.ShutdownAll();
+
+		if(client != null)
+		{
+
+			client.UnregisterHandler(MsgType.Connect);
+			client.UnregisterHandler(MsgType.Disconnect);
+			client.UnregisterHandler(MsgType.Error);
+			client.UnregisterHandler(CustomMsgType.ReadyToPlay);
+			client.UnregisterHandler(CustomMsgType.RestartClient);
+			client.UnregisterHandler(CustomMsgType.Ping);
+			client.UnregisterHandler (CustomMsgType.ResetOrientation);
+		}
+	}
+
+	void CreateNetworkClient ()
+	{
+		ClearNetworkClient();
+
+
+		client = new NetworkClient();
+
+		client.RegisterHandler(MsgType.Connect, OnConnected);
+		client.RegisterHandler(MsgType.Disconnect, OnDisconnected);
+		client.RegisterHandler(MsgType.Error, OnError);
+		client.RegisterHandler(CustomMsgType.ReadyToPlay, OnReadyToPlay);
+		client.RegisterHandler(CustomMsgType.RestartClient, OnRestartClient);
+		client.RegisterHandler(CustomMsgType.Ping, OnPing);
+		client.RegisterHandler (CustomMsgType.ResetOrientation, OnResetOrientation);
+
+	}
+
 	private void PlayExperienceVideo ()
 	{
-		playingExperienceVideo = true;
 		audioSource2.Stop ();
 		videoPlayer.Stop ();
 		videoPlayer.clip = experienceVideo;
@@ -159,6 +216,7 @@ public class Client : MonoBehaviour {
 			yield return new WaitForEndOfFrame();
 		}
 
+		Debug.Log("Video has finished, back to loop");
 		PlayLoopVideo();
 	}
 
@@ -166,23 +224,24 @@ public class Client : MonoBehaviour {
 	{
 		Debug.Log(string.Format("Client has connected to server with connection id: {0}", netMsg.conn.connectionId));
 		UI.gameObject.SetActive(false);
-		NetworkServer.SetClientReady(netMsg.conn);
+		//NetworkServer.SetClientReady(netMsg.conn);
 		VRSettings.enabled = true;
-
-		if(playingExperienceVideo)
-		{
-			Debug.Log("was playing experience video so start syncing again");
-			StopAllCoroutines();
-			StartCoroutine(ChangeToLoopWhenFinished());
-		}
 	}
 
 	private void OnDisconnected (NetworkMessage netMsg)
 	{
 		Debug.Log("Client disconnected! Reconnecting");
-		client.Connect(ip, port);
+		Reconnect();
+
+
 	}
 
+	void Reconnect ()
+	{
+		CreateNetworkClient ();
+		client.Connect(ip, port);
+	}
+		
 	private void OnError (NetworkMessage netMsg)
 	{
 		Debug.Log("Client error: " + netMsg.ToString());

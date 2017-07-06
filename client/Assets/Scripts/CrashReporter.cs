@@ -22,6 +22,7 @@ public class CrashReporter: MonoBehaviour
 	{
 		string logPath = Application.persistentDataPath + "/crash.txt";
 		string log = condition + "\n" + stackTrace;
+		Debug.Log("saving crash to " + logPath);
 		File.AppendAllText(logPath, log);
 	}
 }

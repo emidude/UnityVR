@@ -120,6 +120,7 @@ public class Server : MonoBehaviour {
 				timePingSent = Time.realtimeSinceStartup;
 				clientConnection.Send(CustomMsgType.Ping, new PingMessage());
 				waitingForPingResponse = true;
+				StartCoroutine(RetryPingAfterTimeout());
 				yield return new WaitForEndOfFrame();
 			}
 		}
@@ -127,8 +128,16 @@ public class Server : MonoBehaviour {
 		latencySequenceFinished = true;
 	}
 
+	private IEnumerator RetryPingAfterTimeout ()
+	{
+		yield return new WaitForSeconds(1.0f);
+		timePingSent = Time.realtimeSinceStartup;
+		clientConnection.Send(CustomMsgType.Ping, new PingMessage());
+	}
+
 	private void OnPongResponse (NetworkMessage netMsg)
 	{
+		StopCoroutine("RetryPingAfterTimeout");
 		waitingForPingResponse = false;
 		//////////////////////////////////////////
 		float pingTime = (Time.realtimeSinceStartup - timePingSent)/2;
