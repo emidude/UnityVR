@@ -95,6 +95,11 @@ public class Server : MonoBehaviour {
 
 		clientConnection = netMsg.conn;
 
+		if(latencySequenceFinished && OnClientConnected != null)
+		{
+			OnClientConnected();
+		}
+
 		StartCoroutine(DetermineLatency());
 	}
 
