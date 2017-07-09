@@ -24,6 +24,13 @@ public class Server : MonoBehaviour {
 	[SerializeField]
 	private VideoPlayer videoPlayer;
 
+	[SerializeField]
+	private VideoClip loopVideo2;
+
+	[SerializeField]
+	private VideoClip experienceVideo;
+
+
 	//DECLARED AUDIO SOURCE
 	[SerializeField]
 	private AudioSource audioSource;
@@ -79,6 +86,7 @@ public class Server : MonoBehaviour {
 
 		//Assign the Audio from Video to AudioSource to be played
 		videoPlayer.EnableAudioTrack(0, true);
+		PlayLoopVideo2();
 	}
 		
 	private void OnServerConnect(NetworkMessage netMsg)
@@ -200,6 +208,8 @@ public class Server : MonoBehaviour {
 
 	public void SendPlayVideo()
 	{
+		videoPlayer.Stop ();
+		videoPlayer.clip = experienceVideo;
 		clientConnection.Send(CustomMsgType.ReadyToPlay, new ReadyToPlayVideoMessage());
 		isPlayingExperienceVideo = true;
 	}
@@ -208,6 +218,7 @@ public class Server : MonoBehaviour {
 	{
 		clientConnection.Send(CustomMsgType.RestartClient, new RestartClientMessage());
 		isPlayingExperienceVideo = false;
+		PlayLoopVideo2 ();
 	}
 
 	private void OnSyncVideoPlaybackTime (NetworkMessage netMsg)
@@ -257,4 +268,14 @@ public class Server : MonoBehaviour {
 	{
 		clientConnection.Send (CustomMsgType.ResetOrientation, new ResetOrientationMessage ());
 	}
+
+	private void PlayLoopVideo2 ()
+	{
+		
+		videoPlayer.Stop ();
+		videoPlayer.clip = loopVideo2;
+		videoPlayer.isLooping = true;
+		videoPlayer.Play();
+	}
+
 }
