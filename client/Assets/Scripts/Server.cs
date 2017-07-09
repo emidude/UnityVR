@@ -22,13 +22,13 @@ public class Server : MonoBehaviour {
 	private int port;
 
 	[SerializeField]
-	private VideoPlayer videoPlayer;
+	private VideoPlayer videoPlayer2;
 
 	[SerializeField]
 	private VideoClip loopVideo2;
 
 	[SerializeField]
-	private VideoClip experienceVideo;
+	private VideoClip experienceVideo2;
 
 
 	//DECLARED AUDIO SOURCE
@@ -44,7 +44,7 @@ public class Server : MonoBehaviour {
 	private bool latencySequenceFinished = false;
 	private List<float> pingTimes = new List<float>();
 
-	private bool isPlayingExperienceVideo = false;
+	private bool isPlayingExperienceVideo2 = false;
 
 	public  float Latency
 	{
@@ -79,13 +79,13 @@ public class Server : MonoBehaviour {
 		#else 
 		//Set Audio Output to AudioSource
 		audioSource = gameObject.AddComponent<AudioSource>();
-		videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
-		videoPlayer.SetTargetAudioSource(0, audioSource);
+		videoPlayer2.audioOutputMode = VideoAudioOutputMode.AudioSource;
+		videoPlayer2.SetTargetAudioSource(0, audioSource);
 		#endif
 
 
 		//Assign the Audio from Video to AudioSource to be played
-		videoPlayer.EnableAudioTrack(0, true);
+		videoPlayer2.EnableAudioTrack(0, true);
 		PlayLoopVideo2();
 	}
 		
@@ -208,9 +208,10 @@ public class Server : MonoBehaviour {
 
 	public void SendPlayVideo()
 	{
-		videoPlayer.Stop ();
-		videoPlayer.clip = experienceVideo;
-		isPlayingExperienceVideo = true;
+		videoPlayer2.Stop ();
+		videoPlayer2.clip = experienceVideo2;
+		isPlayingExperienceVideo2 = true;
+		videoPlayer2.isLooping = false;
 		clientConnection.Send(CustomMsgType.ReadyToPlay, new ReadyToPlayVideoMessage());
 
 	}
@@ -218,13 +219,13 @@ public class Server : MonoBehaviour {
 	public void SendReset ()
 	{
 		clientConnection.Send(CustomMsgType.RestartClient, new RestartClientMessage());
-		isPlayingExperienceVideo = false;
+		isPlayingExperienceVideo2 = false;
 		PlayLoopVideo2 ();
 	}
 
 	private void OnSyncVideoPlaybackTime (NetworkMessage netMsg)
 	{
-		if (!isPlayingExperienceVideo || !videoPlayer.isPlaying) 
+		if (!isPlayingExperienceVideo2 || !videoPlayer2.isPlaying) 
 		{
 			return;
 		}
@@ -237,13 +238,13 @@ public class Server : MonoBehaviour {
 		SyncVideoPlaybackTimeMessage message = netMsg.reader.ReadMessage<SyncVideoPlaybackTimeMessage>();
 	//	StartCoroutine(DetermineLatency());
 		//Delay = (float)videoPlayer.time - (message.Time);
-		Delay = (float)videoPlayer.time - (message.Time + Latency);
+		Delay = (float)videoPlayer2.time - (message.Time + Latency);
 
-		videoPlayer.playbackSpeed = 1.0f;
+		videoPlayer2.playbackSpeed = 1.0f;
 
 		Debug.Log("delay between server and client is " + Delay);
 
-		if(Delay > acceptableDelay && videoPlayer.isPlaying)
+		if(Delay > acceptableDelay && videoPlayer2.isPlaying)
 		{
 			StartCoroutine(PauseToSync(Delay));
 		}
@@ -252,16 +253,16 @@ public class Server : MonoBehaviour {
 		{
 			float speed = 1.0f + Mathf.Abs (Delay) * videoSpeedUpMultiplier;
 			Debug.Log("speeding up the video to catch up to client. Speed = " + speed);
-			videoPlayer.playbackSpeed = speed;
+			videoPlayer2.playbackSpeed = speed;
 		}
 	}
 
 	private IEnumerator PauseToSync (float delay)
 	{
 		Debug.Log("pause for " + delay);
-		videoPlayer.Pause();
+		videoPlayer2.Pause();
 		yield return new WaitForSeconds(delay);
-		videoPlayer.Play();
+		videoPlayer2.Play();
 		Debug.Log("resume");
 	}
 
@@ -273,11 +274,11 @@ public class Server : MonoBehaviour {
 	private void PlayLoopVideo2 ()
 	{
 		
-		videoPlayer.Stop ();
-		videoPlayer.clip = loopVideo2;
-		videoPlayer.Prepare ();
-		videoPlayer.isLooping = true;
-		videoPlayer.Play();
+		videoPlayer2.Stop ();
+		videoPlayer2.clip = loopVideo2;
+	//	videoPlayer.Prepare ();
+		videoPlayer2.isLooping = true;
+		videoPlayer2.Play();
 	}
 
 }
