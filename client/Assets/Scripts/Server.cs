@@ -210,8 +210,9 @@ public class Server : MonoBehaviour {
 	{
 		videoPlayer.Stop ();
 		videoPlayer.clip = experienceVideo;
-		clientConnection.Send(CustomMsgType.ReadyToPlay, new ReadyToPlayVideoMessage());
 		isPlayingExperienceVideo = true;
+		clientConnection.Send(CustomMsgType.ReadyToPlay, new ReadyToPlayVideoMessage());
+
 	}
 
 	public void SendReset ()
@@ -274,6 +275,7 @@ public class Server : MonoBehaviour {
 		
 		videoPlayer.Stop ();
 		videoPlayer.clip = loopVideo2;
+		videoPlayer.Prepare ();
 		videoPlayer.isLooping = true;
 		videoPlayer.Play();
 	}
