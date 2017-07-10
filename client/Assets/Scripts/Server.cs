@@ -75,7 +75,7 @@ public class Server : MonoBehaviour {
 		server.RegisterHandler(CustomMsgType.SyncVideoPlaybackTime, OnSyncVideoPlaybackTime);
 
 		#if UNITY_IOS
-		videoPlayer.audioOutputMode = VideoAudioOutputMode.Direct;
+		videoPlayer2.audioOutputMode = VideoAudioOutputMode.Direct;
 		#else 
 		//Set Audio Output to AudioSource
 		audioSource = gameObject.AddComponent<AudioSource>();
